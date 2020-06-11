@@ -41,7 +41,7 @@ class Test(unittest.TestCase):
     def test(self):
         pop = OnePatchPopulation()
         model = VitalSIR(pop)
-        model.run(365)
+        #model.run(365)
 
 if __name__ == '__main__':
     unittest.main()

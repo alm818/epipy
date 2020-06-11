@@ -197,6 +197,8 @@ class rigid_csr_matrix:
     def transform(self, values, row_ind, col_ind, t):
         """sparse matrix transform values at row_ind[i],col_ind[i] to data[i] after one unit time for t time
         Note: the row_ind[i], col_ind[i] has to be a nnz entry of the sparse matrix
+            values, row_ind, col_ind have to be ndarray
+            row_ind, col_ind cannot be repeated
         Examples
         --------
           [[4, 0, 9, 0],
@@ -213,3 +215,8 @@ class rigid_csr_matrix:
         """
         data_, indices_, indptr_ = sparse_transform(self.data, self.indices, self.indptr, values, row_ind, col_ind, t)
         return rigid_csr_matrix((data_, indices_, indptr_), shape=self.shape)
+
+    def get_csr_matrix(self):
+        """return scipy csr_matrix
+        """
+        return csr_matrix((self.data, self.indices, self.indptr), shape=self.shape)
