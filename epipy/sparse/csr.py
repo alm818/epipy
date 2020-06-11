@@ -220,3 +220,9 @@ class rigid_csr_matrix:
         """return scipy csr_matrix
         """
         return csr_matrix((self.data, self.indices, self.indptr), shape=self.shape)
+
+    def get_transpose(self):
+        """return a transpose rigid_csr_matrix
+        """
+        mat = self.get_csr_matrix().tocoo()
+        return rigid_csr_matrix((mat.data, (mat.col, mat.row)), shape=(self.shape[1], self.shape[0]))

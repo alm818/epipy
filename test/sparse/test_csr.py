@@ -181,5 +181,31 @@ class TestRightScale(unittest.TestCase):
 
             self.assertEqual(len(row), 0)
 
+@unittest.skip("Finished tested, disable for faster unittest")
+class TestTranspose(unittest.TestCase):
+    def test_transpose(self):
+        N = 3
+        data = np.array([1.0,2.0,3.0,4.0])
+        row = np.array([0,0,1,2])
+        col = np.array([0,1,2,2])
+        """
+          [[1, 2, 0],
+           [0, 0, 3],
+           [0, 0, 4]]
+        """
+        """
+        Expected:
+          [[1, 0, 0],
+           [2, 0, 0],
+           [0, 3, 4]]
+        """
+        answer = csr_matrix((data,(row, col)), shape=(N,N)).T
+        result = rigid_csr_matrix((data,(row, col)), shape=(N,N)).get_transpose().get_csr_matrix()
+
+        dif = np.abs(answer - result)
+        row, col = dif.nonzero()
+
+        self.assertEqual(len(row), 0)
+
 if __name__ == '__main__':
     unittest.main()
