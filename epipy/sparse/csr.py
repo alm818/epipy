@@ -99,7 +99,7 @@ def sparse_right_scale(data, indices, indptr, b):
     M = len(indptr_)-1
     for row in prange(M):
         for i in prange(indptr_[row], indptr_[row+1]):
-            data_[i] *= b[indices_[i]]
+            data_[i] *= b[int(indices_[i])]
     return data_, indices_, indptr_
 
 @jit(nopython=True, parallel=True)

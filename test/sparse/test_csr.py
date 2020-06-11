@@ -1,6 +1,6 @@
 import unittest
 from epipy.sparse import rigid_csr_matrix
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_matrix, dia_matrix
 from test import generate_test, sum_duplicated_coo
 import numpy as np
 
@@ -127,6 +127,59 @@ class TestMulVec(unittest.TestCase):
             nz = dif.nonzero()[0]
 
             self.assertEqual(len(nz), 0)
+
+@unittest.skip("Finished tested, disable for faster unittest")
+class TestRightScale(unittest.TestCase):
+    def test_right_scale_small(self):
+        N = 3
+        data = np.array([1.0,2.0,3.0,4.0])
+        row = np.array([0,0,1,2])
+        col = np.array([0,1,2,2])
+        b = np.array([3,2,4])
+        """
+          [[1, 2, 0],  [3
+           [0, 0, 3],   2
+           [0, 0, 4]]   4]
+        """
+        """
+        Expected:
+          [[3, 4, 0],
+           [0, 0, 12],
+           [0, 0, 16]]
+        """
+        mat = csr_matrix((data,(row, col)), shape=(N,N))
+        rmat = rigid_csr_matrix((data,(row, col)), shape=(N,N))
+
+        answer = np.array([[3, 4, 0], [0, 0, 12], [0, 0, 16]])
+        result = rmat.right_scale(b).get_csr_matrix()
+
+        dif = np.sum(np.abs(answer - result))
+        self.assertEqual(dif, 0)
+
+    def test_right_scale_big(self):
+        Ns = [5]
+        degs = [1]
+        T = 10
+        tests = generate_test(T, Ns, degs)
+
+        for j in range(T):
+            N, deg = tests[j]
+            N, deg = int(N), int(deg)
+            row, col = np.random.randint(0, N, (2, N*deg))
+            data = np.random.rand(N*deg)
+            b = np.random.rand(N)
+
+            mat = csr_matrix((data,(row, col)), shape=(N,N))
+            B = dia_matrix((b, [0]), shape=(N,N))
+            rmat = rigid_csr_matrix((data,(row, col)), shape=(N,N))
+
+            answer = mat * B
+            result = rmat.right_scale(b).get_csr_matrix()
+
+            dif = np.abs(answer - result)
+            row, col = dif.nonzero()
+
+            self.assertEqual(len(row), 0)
 
 if __name__ == '__main__':
     unittest.main()
